@@ -18,9 +18,7 @@ from torch.utils.data import DataLoader, random_split
 
 from dataset import load_all_sessions, mark_sessions_used
 from model import GhostModel
-
-DATA_DIR   = Path(__file__).parent / "data"
-MODELS_DIR = Path(__file__).parent / "models"
+from paths import DATA_DIR, MODELS_DIR
 
 BATCH_SIZE  = 32
 MAX_EPOCHS  = 50

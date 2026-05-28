@@ -19,8 +19,7 @@ import torch
 
 from frame_source import CaptureDeviceFrameSource
 from model import GhostModel, IMAGENET_MEAN, IMAGENET_STD
-
-MODELS_DIR  = Path(__file__).parent / "models"
+from paths import MODELS_DIR
 TARGET_FPS  = 20
 FRAME_SIZE  = 224
 

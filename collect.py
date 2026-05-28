@@ -22,11 +22,11 @@ import h5py
 import numpy as np
 
 from frame_source import CaptureDeviceFrameSource
+from paths import DATA_DIR
 
 TARGET_FPS   = 20
 FRAME_SIZE   = 224          # resize to 224×224 before saving
 CHUNK_FRAMES = 256          # h5py chunk size along frame axis
-DATA_DIR     = Path(__file__).parent / "data"
 
 # DualSense axis indices under SDL/pygame (USB HID mode)
 AXIS_LX, AXIS_LY = 0, 1
