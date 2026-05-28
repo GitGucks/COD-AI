@@ -55,7 +55,7 @@ class SessionDataset(Dataset):
             "left_stick":  torch.from_numpy(self._left_stick[idx].copy()),
             "right_stick": torch.from_numpy(self._right_stick[idx].copy()),
             "triggers":    torch.from_numpy(self._triggers[idx].copy()),
-            "buttons":     torch.from_numpy(buttons.copy()),
+            "buttons":     torch.from_numpy(self._buttons[idx].copy()),
             "weight":      self.weight,
         }
 
