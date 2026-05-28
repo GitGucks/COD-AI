@@ -26,8 +26,17 @@ class SessionDataset(Dataset):
     def __init__(self, h5_path: Path, weight: float = 1.0) -> None:
         self.h5_path = Path(h5_path)
         self.weight = weight
+
+        # Load entire session into RAM once — avoids opening the HDF5 file
+        # per sample which caused ~200s/epoch due to file open overhead.
+        print(f"    loading {Path(h5_path).name} into RAM...", end=" ", flush=True)
         with h5py.File(self.h5_path, "r") as f:
-            self._len = len(f["frames"])
+            self._frames      = f["frames"][:]       # (N, 224, 224, 3) uint8
+            self._left_stick  = f["left_stick"][:]   # (N, 2) float32
+            self._right_stick = f["right_stick"][:]  # (N, 2) float32
+            self._triggers    = f["triggers"][:]     # (N, 2) float32
+            self._buttons     = f["buttons"][:]      # (N, 14) float32
+        print(f"done ({len(self._frames)} frames)")
 
         mean = torch.tensor(IMAGENET_MEAN, dtype=torch.float32).view(3, 1, 1)
         std  = torch.tensor(IMAGENET_STD,  dtype=torch.float32).view(3, 1, 1)
@@ -35,24 +44,17 @@ class SessionDataset(Dataset):
         self._std  = std
 
     def __len__(self) -> int:
-        return self._len
+        return len(self._frames)
 
     def __getitem__(self, idx: int) -> dict:
-        with h5py.File(self.h5_path, "r") as f:
-            frame       = f["frames"][idx]        # (224, 224, 3) uint8
-            left_stick  = f["left_stick"][idx]    # (2,) float32
-            right_stick = f["right_stick"][idx]   # (2,) float32
-            triggers    = f["triggers"][idx]      # (2,) float32
-            buttons     = f["buttons"][idx]       # (14,) float32
-
-        frame_t = torch.from_numpy(frame.copy()).permute(2, 0, 1).float() / 255.0
+        frame_t = torch.from_numpy(self._frames[idx].copy()).permute(2, 0, 1).float() / 255.0
         frame_t = (frame_t - self._mean) / self._std
 
         return {
             "frame":       frame_t,
-            "left_stick":  torch.from_numpy(left_stick.copy()),
-            "right_stick": torch.from_numpy(right_stick.copy()),
-            "triggers":    torch.from_numpy(triggers.copy()),
+            "left_stick":  torch.from_numpy(self._left_stick[idx].copy()),
+            "right_stick": torch.from_numpy(self._right_stick[idx].copy()),
+            "triggers":    torch.from_numpy(self._triggers[idx].copy()),
             "buttons":     torch.from_numpy(buttons.copy()),
             "weight":      self.weight,
         }

@@ -84,7 +84,7 @@ def main() -> None:
         lr = LR_SCRATCH
 
     optimiser = torch.optim.Adam(model.parameters(), lr=lr)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, patience=3, factor=0.5, verbose=True)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, patience=3, factor=0.5)
 
     best_val   = float("inf")
     no_improve = 0
