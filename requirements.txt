@@ -1,0 +1,14 @@
+# Install PyTorch separately first — visit https://pytorch.org/get-started/locally/
+# and select your OS / CUDA version to get the right pip command.
+# Example (CUDA 12.1):
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+# Example (CPU only):
+#   pip install torch torchvision
+
+# Everything else:
+h5py
+pygame
+opencv-python
+numpy
+tqdm
+vgamepad
