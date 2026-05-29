@@ -24,7 +24,7 @@ TARGET_FPS  = 20
 FRAME_SIZE  = 224
 
 STICK_DEADZONE   = 0.05   # stick values below this are zeroed
-BUTTON_THRESHOLD = 0.50   # sigmoid output above this = button pressed
+BUTTON_THRESHOLD = 0.65   # sigmoid output above this = button pressed
 
 # DS4 button order matching collect.py / model output
 # cross, circle, square, triangle, L1, R1, L2, R2, share, options, L3, R3, PS, touchpad
@@ -33,6 +33,10 @@ BUTTON_NAMES = [
     "L1", "R1", "L2_btn", "R2_btn",
     "share", "options", "L3", "R3", "PS", "touchpad",
 ]
+
+# Buttons that must never fire during gameplay regardless of model output.
+# share/options/PS/touchpad are meta buttons that open menus or take screenshots.
+BUTTON_BLACKLIST = {"share", "options", "PS", "touchpad"}
 
 # vgamepad DS4 button constants in the same order
 _DS4_BUTTON_MAP = None  # lazy-loaded only in live mode
@@ -157,7 +161,10 @@ def main() -> None:
             ry = _apply_deadzone(rs[1])
             l2 = float(tr[0])
             r2 = float(tr[1])
-            pressed = [b > BUTTON_THRESHOLD for b in btn]
+            pressed = [
+                (b > BUTTON_THRESHOLD) and (BUTTON_NAMES[i] not in BUTTON_BLACKLIST)
+                for i, b in enumerate(btn)
+            ]
 
             if args.dry_run:
                 active_btns = [BUTTON_NAMES[i] for i, p in enumerate(pressed) if p]
